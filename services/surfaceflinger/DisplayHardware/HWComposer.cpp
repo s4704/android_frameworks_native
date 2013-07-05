@@ -355,6 +355,7 @@ static const uint32_t PRE_HWC15_DISPLAY_ATTRIBUTES[] = {
     HWC_DISPLAY_HEIGHT,
     HWC_DISPLAY_DPI_X,
     HWC_DISPLAY_DPI_Y,
+    HWC_DISPLAY_FORMAT,
     HWC_DISPLAY_NO_ATTRIBUTE,
 };
 
@@ -418,6 +419,9 @@ status_t HWComposer::queryDisplayProperties(int disp) {
                 case HWC_DISPLAY_COLOR_TRANSFORM:
                     config.colorTransform = values[i];
                     break;
+                case HWC_DISPLAY_FORMAT:
+                    config.format = values[i];
+                    break;
                 default:
                     ALOG_ASSERT(false, "unknown display attribute[%zu] %#x",
                             i, DISPLAY_ATTRIBUTES[i]);
@@ -438,7 +442,9 @@ status_t HWComposer::queryDisplayProperties(int disp) {
 #ifdef USE_BGRA_8888
     mDisplayData[disp].format = HAL_PIXEL_FORMAT_BGRA_8888;
 #else
-    mDisplayData[disp].format = HAL_PIXEL_FORMAT_RGBA_8888;
+    if ((mDisplayData[disp].format != HAL_PIXEL_FORMAT_RGB_565) &&
+        (mDisplayData[disp].format != HAL_PIXEL_FORMAT_RGBA_8888))
+        mDisplayData[disp].format = HAL_PIXEL_FORMAT_RGBA_8888;
 #endif
     mDisplayData[disp].connected = true;
     return NO_ERROR;
@@ -889,10 +895,9 @@ int HWComposer::getVisualID() const {
         // if we have HWC 1.1
 #ifdef USE_BGRA_8888
         return HAL_PIXEL_FORMAT_BGRA_8888;
-#else
-        return HAL_PIXEL_FORMAT_RGBA_8888;
 #endif
         //return HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED;
+        return mDisplayData[0].format;
     } else {
         return mFbDev->format;
     }
