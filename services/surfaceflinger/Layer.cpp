@@ -325,6 +325,10 @@ Rect Layer::getContentCrop() const {
     return crop;
 }
 
+uint32_t Layer::getContentTransform() const {
+    return mCurrentTransform;
+}
+
 Rect Layer::reduce(const Rect& win, const Region& exclude) const{
     if (CC_LIKELY(exclude.isEmpty())) {
         return win;
