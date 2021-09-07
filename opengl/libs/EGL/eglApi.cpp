@@ -138,6 +138,8 @@ static const extention_map_t sExtensionMap[] = {
             (__eglMustCastToProperFunctionPointerType)&eglCreateImageKHR },
     { "eglDestroyImageKHR",
             (__eglMustCastToProperFunctionPointerType)&eglDestroyImageKHR },
+    { "eglGetRenderBufferANDROID",
+        (__eglMustCastToProperFunctionPointerType)&eglGetRenderBufferANDROID },
 
     // EGL_KHR_reusable_sync, EGL_KHR_fence_sync
     { "eglCreateSyncKHR",
@@ -1830,6 +1832,22 @@ EGLBoolean eglPresentationTimeANDROID(EGLDisplay dpy, EGLSurface surface,
     native_window_set_buffers_timestamp(s->win.get(), time);
 
     return EGL_TRUE;
+}
+
+EGLClientBuffer eglGetRenderBufferANDROID(EGLDisplay dpy, EGLSurface draw)
+{
+    clearError();
+
+    const egl_display_ptr dp = validate_display(dpy);
+    if (!dp) return EGL_FALSE;
+
+    egl_surface_t const * const s = get_surface(draw);
+
+    egl_connection_t* const cnx = &gEGLImpl;
+    if (cnx->dso && cnx->egl.eglGetRenderBufferANDROID) {
+        return cnx->egl.eglGetRenderBufferANDROID(dp->disp.dpy, s->surface);
+    }
+    return setError(EGL_BAD_DISPLAY, (EGLClientBuffer*)0);
 }
 
 // ----------------------------------------------------------------------------
