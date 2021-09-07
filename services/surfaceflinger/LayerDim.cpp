@@ -59,16 +59,6 @@ bool LayerDim::isVisible() const {
     return !(s.flags & layer_state_t::eLayerHidden) && s.alpha;
 }
 
-static Rect reduce(const Rect& win, const Region& exclude) {
-    if (CC_LIKELY(exclude.isEmpty())) {
-        return win;
-    }
-    if (exclude.isRect()) {
-        return win.reduce(exclude.getBounds());
-    }
-    return Region(win).subtract(exclude).getBounds();
-}
-
 FloatRect LayerDim::computeCrop(const sp<const DisplayDevice>& hw) const {
     // the content crop is the area of the content that gets scaled to the
     // layer's size.
